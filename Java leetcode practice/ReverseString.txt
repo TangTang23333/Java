@@ -1,0 +1,49 @@
+//reverse string 
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
+
+public class week0711 {
+
+    @Test
+    public void testReverseString() {
+
+        assertEquals("fedcba", ReverseString("abcdef"));
+        assertEquals("", ReverseString(""));
+        assertEquals("A", ReverseString("A"));
+        assertEquals("ABa", ReverseString("aBA"));
+
+    }
+
+
+    public static void main(String[] args) {
+
+        //String s = "abcdef";
+        //System.out.println(ReverseString(s));
+    }
+
+
+
+    public static String ReverseString(String s) {
+        String[] res = s.split("");
+
+        int i = 0 ;
+        int j = s.length() - 1;
+
+        while (i < j) {
+            var temp = res[i];
+            res[i] = res[j];
+            res[j] = temp;
+            i ++;
+            j --;
+        }
+
+
+        String output = String.join("", res);
+        return output;
+    }
+
+}
+
