@@ -1,0 +1,58 @@
+237 · Missing Integer
+
+Description
+An array A contains all the integers from 0 to n, except for one number which is missing. In this problem, we cannot access entire integers in A with a single operation. The elements of A are represented in binary, and the only operation we can use to access them is "fetch the jth bit of A[i]", which takes constant time. Write code to find the missing integer. Can you do it in O(n) time?
+
+
+
+# Memo:
+
+1. get accumulative xor product , then xor again the oct of each binary, the final xor product is missing number. Because it only exists once. 
+
+4608ms, 31.82% 
+
+
+
+/**
+ * Definition of BitInteger:
+ * public class BitInteger {
+ *     public static int INTEGER_SIZE = 31;
+ *     public int fetch(int j) {
+ *         .... // return 0 or 1, fetch the jth bit of this number
+ *     }
+ * }
+ */
+public class Solution {
+    /**
+     * @param array a BitInteger list
+     * @return an integer
+     */
+    public int findMissing(ArrayList<BitInteger> array) {
+        // Write your code here
+        
+        // get XOR accumulative res 
+        int xor = 0, n = array.size()+1;
+
+        for (int i = 0; i < n; i++) {
+            xor ^= i;
+        }
+        
+
+        // xor all the nums in array, so the missing number is the final xor
+        for (BitInteger num : array) {
+            int oct = 0;
+
+            // convert binary to oct
+            for (int i = 0; i < num.INTEGER_SIZE; i++) {
+                if ( num.fetch(i) == 1 ) {
+                    oct += 1 << i ;
+                }
+            }
+
+            xor ^= oct;
+        }
+
+        return xor;
+
+    }
+}
