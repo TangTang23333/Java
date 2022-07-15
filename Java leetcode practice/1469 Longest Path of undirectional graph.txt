@@ -1,0 +1,200 @@
+1469 · Longest Path On The Tree
+
+Description
+Given a tree consisting of n nodes, n-1 edges. Output the distance between the two nodes with the furthest distance on this tree.
+Given three arrays of size n-1, starts, ends, and lens, indicating that the i-th edge is from starts[i] to ends[i] and the length is lens[i].
+
+
+# Memo:
+
+1. BFS two traversal
+a. buildGraph with bi-directions. 
+b. start find with node whose indegree = 1
+c. could find the candidate node whose distance to start is the longest. 
+d. reverse BFS traversal from the candidate node find the longest path. 
+2222ms, 85.6%
+
+
+```
+from typing import (
+    List,
+)
+
+class Solution:
+    """
+    @param n: The number of nodes
+    @param starts: One point of the edge
+    @param ends: Another point of the edge
+    @param lens: The length of the edge
+    @return: Return the length of longest path on the tree.
+    """
+    def longest_path(self, n: int, starts: List[int], ends: List[int], lens: List[int]) -> int:
+        # Write your code here
+        neighbors = self.buildGraph(starts, ends, lens)
+        queue = []
+
+
+        # find node with 0 inDegree, that can be our starters to find path
+        for key in neighbors.keys():
+            if len(neighbors[key]) == 1:
+                start = key
+        
+        
+        node, res = self.bfs([start], neighbors)
+        nodeReverse, resRerverse = self.bfs([node], neighbors)
+
+    
+        return resRerverse
+
+
+
+
+    def bfs(self, queue, neighbors):
+
+        distance = {each : 0 for each in queue}
+        res = 0
+        # distance record maxi lenth from the start to this node: distance = {node: maxDistance}
+        while queue: 
+            nextLayer = []
+
+            for currentNode in queue:
+                for nextNode, pathLength in neighbors[currentNode]:
+                    if nextNode not in distance:
+                        nextLayer.append(nextNode)
+                        distance[nextNode] = pathLength + distance[currentNode]
+                        if res < distance[nextNode]:
+                            node = nextNode
+                            res = distance[nextNode]
+            
+            
+            queue = nextLayer 
+
+        return node, res
+
+
+    def buildGraph(self, starts, ends, lens):
+
+        neighbors = {}
+
+        for i in range(len(starts)):
+            if starts[i]  not in neighbors:
+                neighbors[starts[i]] = []
+            if ends[i] not in neighbors:
+                neighbors[ends[i]] = []
+            
+            neighbors[starts[i]].append((ends[i], lens[i]))
+            neighbors[ends[i]].append((starts[i], lens[i]))
+
+
+        return neighbors
+            
+```
+
+2. java, same approach 3212ms, 79.4%
+
+
+```
+public class Solution {
+    /**
+     * @param n: The number of nodes
+     * @param starts: One point of the edge
+     * @param ends: Another point of the edge
+     * @param lens: The length of the edge
+     * @return: Return the length of longest path on the tree.
+     */
+    public int longestPath(int n, int[] starts, int[] ends, int[] lens) {
+        // Write your code here
+        HashMap<Integer, HashMap<Integer, Integer>> neighbors = buildGraph(starts, ends, lens);
+
+        int start = 0;
+        // find first node whose indegree is 1
+        for (Integer key: neighbors.keySet()) {
+            if (neighbors.get(key).size() == 1) {
+                start = key;
+                break; 
+            }
+        }
+
+
+        // twice bfs traversal to get the longest path
+        var candidate = bfs(start, neighbors);
+        var reverseCandidate = bfs(candidate[0], neighbors);
+
+
+        return reverseCandidate[1]; 
+
+
+    }
+
+
+    public Integer[] bfs(int start, HashMap<Integer, HashMap<Integer, Integer>> neighbors) {
+        // start from start node, init distance[start] = 0
+        ArrayDeque<Integer> deque = new ArrayDeque();
+        deque.push(start);
+        Map<Integer, Integer> distance = new HashMap<Integer, Integer>();
+        distance.put(start, 0);
+
+
+        // init result 
+        Integer path = 0 ;
+        Integer candidate = 0; 
+
+
+        // bfs traversal 
+        while (deque.size() > 0) {
+            Integer currentNode = deque.poll();
+            
+            // find nextNode of currentNode, if they are visited, continue, if not update distance to nextNode = dist[currentNode] + neighbors[currentNode][nextNode]
+            for (Integer nextNode: neighbors.get(currentNode).keySet()) {
+                
+                if (!distance.containsKey(nextNode)) {
+                    
+                    distance.put(nextNode, distance.get(currentNode) + neighbors.get(currentNode).get(nextNode));
+                    deque.push(nextNode);
+
+                    // comparison to get the longest path so far 
+                    if (path < distance.get(nextNode)) {
+                        path = distance.get(nextNode);
+                        candidate = nextNode;
+                    }
+                }
+            }
+        }
+
+
+        return new Integer[] {candidate, path};
+
+    }
+
+
+
+
+
+    public HashMap<Integer, HashMap<Integer, Integer>> buildGraph(int[] starts, int[] ends, int[] lens) {
+
+        HashMap<Integer, HashMap<Integer, Integer>> neighbors = new HashMap<Integer, HashMap<Integer, Integer>>();
+
+
+
+        for (int i = 0; i < starts.length; i++) {
+            if (!neighbors.containsKey(starts[i])) {
+                neighbors.put( starts[i],  new HashMap<Integer, Integer>());
+            }
+
+            if (!neighbors.containsKey(ends[i])) {
+                neighbors.put( ends[i], new HashMap<Integer, Integer>());
+            }
+
+            neighbors.get(starts[i]).put(ends[i], lens[i]);
+            neighbors.get(ends[i]).put(starts[i], lens[i]);
+
+        }
+
+
+
+        return neighbors;
+ 
+    }
+}
+```
+
